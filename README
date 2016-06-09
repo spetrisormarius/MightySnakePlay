@@ -1,0 +1,20 @@
+Copyright (C) 2016, Marius-Petrisor Stoian <spetrisormarius@yahoo.com>
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+MightySnake - classic snake game
+
+This game runs on Microsoft Windows 7, 8 and 10 and requires DirectX 8.0.
+
+Controls:
+Move - Arrows keys
+Pause - <ESC> key
+Menu action - Left click with mouse or <SPACE> key.
+ 
+MightySnake is provided "as is" with no warranty.  The exact terms
+under which you may use and (re)distribute this program are detailed
+in the GNU General Public License, in the file COPYING.
+
+Send any questions, suggestions and bug reports to spetrisormarius@yahoo.com.
