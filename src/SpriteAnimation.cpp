@@ -14,34 +14,33 @@
  * You should have received a copy of the GNU General Public License
  * along with MightySnake.  If not, see <http://www.gnu.org/licenses/>.
  */
- #pragma once
+#include "SpriteAnimation.h"
+#include <exception>
 
-//#include "hge.h"
-#include "SnakeGame.h"
-//#include "hgefont.h"
-#include "GameEngineFactory.h"
-
-using namespace mightysnake;
-
-class GameMain        
+namespace mightysnake
 {
-public:
-	static GameMain& GetInstance();
-	
-	bool Create(void);
-	bool Run();
-	void Destroy(void);
-	static bool FrameFunc();
-	static bool RenderFunc();
-	void ErrorMessage();
-private:
-	GameMain(void);
-	~GameMain(void);
-	bool UpdateFrame();
-	void Render();
-    
-	//HGE * mpEngine;
-	SnakeGame mSnakeGame;
-	//hgeFont* mpFnt;
-    shared_ptr<Font> mFnt;
-};
+
+SpriteAnimation::SpriteAnimation(void)
+{
+}
+
+SpriteAnimation::~SpriteAnimation(void)
+{
+}
+
+void SpriteAnimation::SetMode( int flag )
+{
+	throw std::exception("The method or operation is not implemented.");
+}
+
+bool SpriteAnimation::IsPlaying()
+{
+	throw std::exception("The method or operation is not implemented.");
+}
+
+void SpriteAnimation::Update( float fDeltaTime )
+{
+	throw std::exception("The method or operation is not implemented.");
+}
+
+}

@@ -14,34 +14,41 @@
  * You should have received a copy of the GNU General Public License
  * along with MightySnake.  If not, see <http://www.gnu.org/licenses/>.
  */
- #pragma once
+#pragma once
 
-//#include "hge.h"
-#include "SnakeGame.h"
-//#include "hgefont.h"
-#include "GameEngineFactory.h"
+#include "HgeGameEngine.h"
 
-using namespace mightysnake;
+namespace mightysnake 
+{
 
-class GameMain        
+class GameEngineFactory
 {
 public:
-	static GameMain& GetInstance();
-	
-	bool Create(void);
-	bool Run();
-	void Destroy(void);
-	static bool FrameFunc();
-	static bool RenderFunc();
-	void ErrorMessage();
+	enum EngineType
+	{
+		HGE,
+		COCOS_2DX
+	};
+
+	static shared_ptr<GameEngine> getEngine(EngineType engineType) 
+	{
+		if (HGE == engineType) {
+			static shared_ptr<GameEngine> gameEngine(new HgeGameEngine());
+			return gameEngine;
+		}
+
+		return shared_ptr<GameEngine>();
+	}
+
 private:
-	GameMain(void);
-	~GameMain(void);
-	bool UpdateFrame();
-	void Render();
-    
-	//HGE * mpEngine;
-	SnakeGame mSnakeGame;
-	//hgeFont* mpFnt;
-    shared_ptr<Font> mFnt;
+	~GameEngineFactory(void)
+	{
+	}
+
+	GameEngineFactory(void)
+	{
+	}
+
 };
+
+}

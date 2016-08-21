@@ -28,7 +28,7 @@ SnakeFood::SnakeFood()
 
 SnakeFood::~SnakeFood(void)
 {
- SAFEDELETE(mpSnakeFoodSprite);
+ //SAFEDELETE(mpSnakeFoodSprite);
 }
 
 

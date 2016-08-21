@@ -27,8 +27,10 @@ mGrowCount(0),
 mpSnakeContorsion(0)
 {
   assert( 0 != mpGame);
-  mpScreen = mpGame->GetScreen();
-  assert( 0 != mpScreen);
+  //mpScreen = mpGame->GetScreen();
+  mGameEngine = mpGame->GetEngine();
+  //assert( 0 != mpScreen);
+
   }
 
 SnakePlayer::~SnakePlayer(void)
@@ -48,13 +50,16 @@ int SnakePlayer::CreatePlayer()
 		mpGame->GetSurfaceDimension(mSurfaceWidth, mSurfaceHeight);
 
 		assert( 0 == mpSnakePartList);
-		mpSnakePartList = new SnakePartList(mpScreen);
+		
+		shared_ptr<GameGraphicFactory> graphics = mGameEngine->GetGraphicFactory();
+
+		mpSnakePartList = new SnakePartList(graphics->GetSnakePartWidth(), graphics->GetSnakePartHeight());
 
 		mpSnakePartList->SetSurfaceDimension(mSurfaceWidth, mSurfaceHeight);
-		mpSnakePartList->Create();
+		mpSnakePartList->Create(graphics);
 
 		assert( 0 == mpSnakeContorsion);
-		mpSnakeContorsion = new SnakeContorsionList(mpSnakePartList);
+		mpSnakeContorsion = new SnakeContorsionList(mpSnakePartList, graphics);
 
 		mPlayerTic = 0.2f;
 		mSnakePlayerTimer.SetTimer(mPlayerTic);
@@ -110,13 +115,13 @@ void SnakePlayer::Render()
 	mpSnakeContorsion->RenderCornerSpace();
 }
 
-bool SnakePlayer::IntersectHead(const hgeRect& boundingBox)
+bool SnakePlayer::IntersectHead( const Rect& boundingBox )
 {
 	assert( 0 != mpSnakePartList);
 	return mpSnakePartList->IntersectHead(boundingBox);
 }
 
-bool SnakePlayer::Intersect(const hgeRect& boundingBox)
+bool SnakePlayer::Intersect( const Rect& boundingBox )
 {
 	assert( 0 != mpSnakePartList);
 	return mpSnakePartList->Intersect(boundingBox);
@@ -129,7 +134,7 @@ bool SnakePlayer::IsHeadEven()
 }
 
 
-hgeVertex& SnakePlayer::GetHeadPosition()
+Vertex& SnakePlayer::GetHeadPosition()
 {
 	assert(0 != mpSnakePartList);
 	return mpSnakePartList->GetHeadPosition();

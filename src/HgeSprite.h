@@ -14,34 +14,31 @@
  * You should have received a copy of the GNU General Public License
  * along with MightySnake.  If not, see <http://www.gnu.org/licenses/>.
  */
- #pragma once
+#pragma once
+#include "Sprite.h"
+//#include <memory>
+//using namespace std::tr1;
+#include <hgesprite.h>
 
-//#include "hge.h"
-#include "SnakeGame.h"
-//#include "hgefont.h"
-#include "GameEngineFactory.h"
+namespace mightysnake
+{
 
-using namespace mightysnake;
-
-class GameMain        
+class HgeSprite : public virtual Sprite
 {
 public:
-	static GameMain& GetInstance();
-	
-	bool Create(void);
-	bool Run();
-	void Destroy(void);
-	static bool FrameFunc();
-	static bool RenderFunc();
-	void ErrorMessage();
+	HgeSprite(shared_ptr<::hgeSprite> sprite);
+	virtual ~HgeSprite(void);
+	virtual shared_ptr<Rect> GetBoundingBoxEx( float x, float y, float rot ) ;
+	virtual shared_ptr<Rect> GetBoundingBox( float x, float y );
+	virtual void SetHotSpot( float x, float y ) ;
+	virtual void RenderEx( float x, float y, float rot );
+	virtual float GetWidth();
+	virtual float GetHeight();
+	virtual void Render( float x, float y );
 private:
-	GameMain(void);
-	~GameMain(void);
-	bool UpdateFrame();
-	void Render();
-    
-	//HGE * mpEngine;
-	SnakeGame mSnakeGame;
-	//hgeFont* mpFnt;
-    shared_ptr<Font> mFnt;
+	shared_ptr<hgeSprite> mSprite;
+
 };
+
+//end namespace
+}

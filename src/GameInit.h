@@ -24,13 +24,14 @@ class GameInit :
 {
 public:
 
-	GameInit(void):mSnakeMainScreen(this)
+	GameInit(void):mSnakeMainScreen(*this)
 	{
 	}
 public:
 
 	virtual ~GameInit(void)
 	{
+		Destroy(NULL);
 	}
 	static GamePlay* Instance(void)
 	{
@@ -38,14 +39,16 @@ public:
 		return &game;
 	}
 public:
-	virtual void Init(SnakeGame* game, HGE* engine, float widthSurface, float heightSurface, hgeFont* fnt);
+	//virtual void Init(SnakeGame* game, HGE* engine, float widthSurface, float heightSurface, hgeFont* fnt);
+	virtual void Enter(SnakeGame* game);
+
 	virtual bool UpdateFrame(SnakeGame* game);
 	// draw
 	virtual void Render(SnakeGame* game);
-	virtual void Destroy(SnakeGame* game);
 	virtual void OnPlay();
 	virtual void OnLevel(short level);
 private:
+	void Destroy(SnakeGame* game);
 	void UpdateMainScreen(void);
 	SnakeMainScreen mSnakeMainScreen;
 	SnakeGame* mpGame;

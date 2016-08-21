@@ -15,13 +15,15 @@
  * along with MightySnake.  If not, see <http://www.gnu.org/licenses/>.
  */
  #pragma once
-#include "GamePlay.h"
-#include "GameTilesFactory.h"
-
 #include <memory>
+#include "GamePlay.h"
+#include "GameGraphicFactory.h"
+#include "Sprite.h"
+#include "Rect.h"
 
 using namespace std::tr1;
 using namespace std;
+using namespace mightysnake;
 
 class SnakePart: public GamePlay
 {
@@ -53,24 +55,22 @@ public:
 	{
 	}
 
-	bool IntersectRect(const hgeRect& boundingBox)
+	bool IntersectRect(const Rect& boundingBox)
 	{
-		hgeRect snakeBox = GetBoundingBox();
-		snakeBox.x1 += 2;
-		snakeBox.y1 += 2;
-		snakeBox.x2 -= 2;
-		snakeBox.y2 -= 2;
+		shared_ptr<Rect> snakeBox = GetBoundingBox();
+
+		snakeBox->x1 += 2;
+		snakeBox->y1 += 2;
+		snakeBox->x2 -= 2;
+		snakeBox->y2 -= 2;
 	
-		return snakeBox.Intersect(&boundingBox);
+		return snakeBox->Intersect(&boundingBox);
 	}
 
-	hgeRect GetBoundingBox()
+	shared_ptr<Rect> GetBoundingBox()
 	{
 		assert( 0 != mSnakeSkin);
-		hgeRect snakeBox;
-		mSnakeSkin->GetBoundingBoxEx(x,y,rot, 1,1, &snakeBox);
-
-		return snakeBox;
+		return mSnakeSkin->GetBoundingBoxEx(x,y,rot);
 	}
 
 	virtual bool UpdateFrame()
@@ -110,27 +110,32 @@ public:
 		mSnakeSkin->RenderEx(x, y, rot);
 	}
 
+	void SetGraphics(shared_ptr<GameGraphicFactory>& graphics) 
+	{
+      mGraphics = graphics;
+	}
+
 	void InitSkin()
 	{
 		switch(mSnakeMorphology)
 		{
 			case SnakePart::SNAKE_PART_TAIL_UP:
-				mSnakeSkin = GameTilesFactory::instance().GetSpriteTile(GameTilesFactory::TILE_TYPE_TAIL_UP);
+				mSnakeSkin = mGraphics->GetSprite(GameGraphicFactory::TILE_TAIL_UP);
 				break;
 			case SnakePart::SNAKE_PART_BODY_UP:
-				mSnakeSkin = GameTilesFactory::instance().GetSpriteTile(GameTilesFactory::TILE_TYPE_BODY_UP);
+				mSnakeSkin = mGraphics->GetSprite(GameGraphicFactory::TILE_BODY_UP);
 				break;
 			case SnakePart::SNAKE_PART_HEAD_UP:
-				mSnakeSkin = GameTilesFactory::instance().GetSpriteTile(GameTilesFactory::TILE_TYPE_HEAD_UP);
+				mSnakeSkin = mGraphics->GetSprite(GameGraphicFactory::TILE_HEAD_UP);
 				break;
 			case SnakePart::SNAKE_PART_TAIL_DOWN:
-				mSnakeSkin = GameTilesFactory::instance().GetSpriteTile(GameTilesFactory::TILE_TYPE_TAIL_DOWN);
+				mSnakeSkin = mGraphics->GetSprite(GameGraphicFactory::TILE_TAIL_DOWN);
 				break;
 			case SnakePart::SNAKE_PART_BODY_DOWN:
-				mSnakeSkin = GameTilesFactory::instance().GetSpriteTile(GameTilesFactory::TILE_TYPE_BODY_DOWN);
+				mSnakeSkin = mGraphics->GetSprite(GameGraphicFactory::TILE_BODY_DOWN);
 				break;
 			case SnakePart::SNAKE_PART_HEAD_DOWN:
-				mSnakeSkin = GameTilesFactory::instance().GetSpriteTile(GameTilesFactory::TILE_TYPE_HEAD_DOWN);
+				mSnakeSkin = mGraphics->GetSprite(GameGraphicFactory::TILE_HEAD_DOWN);
 				break;
 		}
 
@@ -148,14 +153,24 @@ public:
 	ESnakeMorphology GetMorphology() {
 		return mSnakeMorphology;
 	}
-
-public:
+private:
 	float x;
 	float y;
 	float dx,dy;
 	float rot;
+public:
+	float GetX() const { return x; }
+	void SetX(float val) { x = val; }
+	float GetY() const { return y; }
+	void SetY(float val) { y = val; }
+	float GetDy() const { return dy; }
+	void SetDy(float val) { dy = val; }
+	float GetDx() const { return dx; }
+	void SetDx(float val) { dx = val; }
+	float GetRot() const { return rot; }
+	void SetRot(float val) { rot = val; }
 private:
 	ESnakeMorphology mSnakeMorphology;
-	shared_ptr<hgeSprite> mSnakeSkin;
+	shared_ptr<Sprite> mSnakeSkin;
+	shared_ptr<GameGraphicFactory> mGraphics;
 };
-

@@ -18,14 +18,14 @@
 #include "SnakeHit.h"
 #include <time.h>
 
-SnakeHit::SnakeHit():
+SnakeHit::SnakeHit()
 //m_nAnimationState(ANIMATION_START),
-mpSnakeHitSprite(0)
+//mpSnakeHitSprite(0)
 {
 }
 
 SnakeHit::~SnakeHit(void)
 {
- SAFEDELETE(mpSnakeHitSprite);
+ //SAFEDELETE(mpSnakeHitSprite);
 }
 

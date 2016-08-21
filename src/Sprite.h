@@ -1,5 +1,5 @@
 /* 
- * Copyright 2016 Petrisor Marius Stoian
+ * Copyright 2016 Petrisor Marius Stoian <spetrisormarius@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,34 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with MightySnake.  If not, see <http://www.gnu.org/licenses/>.
  */
- #pragma once
+#pragma once
 
-//#include "hge.h"
-#include "SnakeGame.h"
-//#include "hgefont.h"
-#include "GameEngineFactory.h"
+#include <memory>
+using namespace std::tr1;
 
-using namespace mightysnake;
+namespace mightysnake {
 
-class GameMain        
+class Rect;
+
+class Sprite
 {
 public:
-	static GameMain& GetInstance();
-	
-	bool Create(void);
-	bool Run();
-	void Destroy(void);
-	static bool FrameFunc();
-	static bool RenderFunc();
-	void ErrorMessage();
-private:
-	GameMain(void);
-	~GameMain(void);
-	bool UpdateFrame();
-	void Render();
-    
-	//HGE * mpEngine;
-	SnakeGame mSnakeGame;
-	//hgeFont* mpFnt;
-    shared_ptr<Font> mFnt;
+	Sprite(void);
+	virtual ~Sprite(void);
+	virtual shared_ptr<Rect> GetBoundingBoxEx( float x, float y, float rot ) ;
+	virtual void SetHotSpot( float x, float y ) ;
+	virtual void RenderEx( float x, float y, float rot );
+	virtual float GetWidth();
+	virtual float GetHeight();
+	virtual void Render( float x, float y );
+	virtual shared_ptr<Rect> GetBoundingBox( float x, float y );
+	virtual void SetFlip( bool param1, bool param2 );
 };
+
+}

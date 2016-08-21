@@ -16,19 +16,22 @@
  */
  #include "StdAfx.h"
 #include "SnakePartList.h"
-#include "GameTilesFactory.h"
 #include "InputParameters.h"
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include <sstream>
 using namespace std;
 
-SnakePartList::SnakePartList(HGE* engine)
+SnakePartList::SnakePartList( float snakePartWidth, float snakePartHeight )
 {
 	mOriginOffset.x = 8;
 	mOriginOffset.y = 8;
 
-	mSnakePartWidth = GameTilesFactory::instance().GetSnakePartWidth();
-	mSnakePartHeight = GameTilesFactory::instance().GetSnakePartHeight();
+	//mSnakePartWidth = GameGraphicFactory::instance().GetSnakePartWidth();
+	//mSnakePartHeight = GameGraphicFactory::instance().GetSnakePartHeight();
+
+	mSnakePartWidth = snakePartWidth;
+	mSurfaceHeight = snakePartHeight;
 
 	mSurfaceWidth = 0;
 	mSurfaceHeight = 0;
@@ -40,19 +43,19 @@ SnakePartList::~SnakePartList(void)
 
 }
 
-hgeVertex SnakePartList::GetHeadPosition()
+Vertex SnakePartList::GetHeadPosition()
 {
 	if (mSnakeActor.empty())
 	{
 		throw std::bad_exception();
 	}
-	hgeVertex res;
-	res.x = mSnakeActor.back().x - abs(mOriginOffset.x);
-	res.y = mSnakeActor.back().y - abs(mOriginOffset.y);
+	Vertex res;
+	res.x = mSnakeActor.back().GetX() - abs(mOriginOffset.x);
+	res.y = mSnakeActor.back().GetY() - abs(mOriginOffset.y);
 	return res;
 }
 
-bool SnakePartList::IntersectHead(const hgeRect& boundingBox)
+bool SnakePartList::IntersectHead( const Rect& boundingBox )
 {
 	if (mSnakeActor.empty() )
 	{
@@ -63,7 +66,7 @@ bool SnakePartList::IntersectHead(const hgeRect& boundingBox)
 }
 
 
-bool SnakePartList::Intersect(const hgeRect& boundingBox)
+bool SnakePartList::Intersect( const Rect& boundingBox )
 {
 	bool bRes = FALSE;
 	
@@ -75,18 +78,16 @@ bool SnakePartList::Intersect(const hgeRect& boundingBox)
 	return bRes;
 }
 
-void SnakePartList::Grow(const hgeVertex& offsetPos)
+void SnakePartList::Grow( const Vertex& offsetPos )
 {
 	SnakePart& tail = mSnakeActor.front();
 
 	SnakePart snakePart;
-	snakePart.x = tail.x;
-	snakePart.y = tail.y;
-	snakePart.dx = tail.dx;
-	snakePart.dy = tail.dy;
-
-	snakePart.rot = tail.rot;
-	snakePart.rot = tail.rot;
+	snakePart.SetX( tail.GetX() );
+	snakePart.SetY(tail.GetY() );
+	snakePart.SetDx(tail.GetDx() );
+	snakePart.SetDy( tail.GetDy());
+	snakePart.SetRot(tail.GetRot());
 
 	//take the tail, copy to new element and set his style
 	//tail is inverse
@@ -101,13 +102,14 @@ void SnakePartList::Grow(const hgeVertex& offsetPos)
 		tail.SetMorphology(SnakePart::SNAKE_PART_TAIL_DOWN);
 	}
 
-	tail.x = tail.x + offsetPos.x;
-	tail.y = tail.y + offsetPos.y;
+	tail.SetX( tail.GetX() + offsetPos.x);
+	tail.SetY( tail.GetY() + offsetPos.y);
 
     mSnakeActor.insert(mSnakeActor.begin() + 1, snakePart);
 	
 	//is necesary to resyncronize all the sprites.
 	for (vector<SnakePart>::size_type indexSnake=0; indexSnake < mSnakeActor.size(); indexSnake++) {
+		mSnakeActor[indexSnake].SetGraphics(mGameGraphicFactory);
 		mSnakeActor[indexSnake].InitSkin();
 	}
 }
@@ -115,18 +117,18 @@ void SnakePartList::Grow(const hgeVertex& offsetPos)
 
 void SnakePartList::StepRight(int ix)
 {
-	float xPos=mSnakeActor[ix].x;
-	xPos+=mSnakeActor[ix].dx;
+	float xPos= mSnakeActor[ix].GetX();
+	xPos+=mSnakeActor[ix].GetDx();
 
 	mIsHit = IsSelfHit();
 	if (!mIsHit)
 	{
-		if (IsBorder( xPos, mSnakeActor[ix].y ))
+		if (IsBorder( xPos, mSnakeActor[ix].GetY() ))
 		{
-			mSnakeActor[ix].x= 0 + mOriginOffset.x;
+			mSnakeActor[ix].SetX( 0 + mOriginOffset.x );
 			RotateRight(ix);
 		} else {
-			mSnakeActor[ix].x=xPos;
+			mSnakeActor[ix].SetX( xPos );
 			RotateRight(ix);
 		}
 	}
@@ -137,18 +139,18 @@ void SnakePartList::StepRight(int ix)
 
 void SnakePartList::StepLeft(int ix)
 {
-	float xPos=mSnakeActor[ix].x;
-	xPos-=mSnakeActor[ix].dx;
+	float xPos= mSnakeActor[ix].GetX();
+	xPos-=mSnakeActor[ix].GetDx();
 	
 	mIsHit = IsSelfHit();
 	if (!mIsHit)
 	{
-		if (IsBorder( xPos, mSnakeActor[ix].y ))
+		if (IsBorder( xPos, mSnakeActor[ix].GetY() ))
 		{
-			mSnakeActor[ix].x= mSurfaceWidth - mOriginOffset.x;
+			mSnakeActor[ix].SetX( mSurfaceWidth - mOriginOffset.x);
 			RotateLeft(ix);
 		} else {
-			mSnakeActor[ix].x=xPos;
+			mSnakeActor[ix].SetX(xPos);
 			RotateLeft(ix);
 		}
 	}
@@ -158,17 +160,17 @@ void SnakePartList::StepLeft(int ix)
 
 void SnakePartList::StepUp(int ix)
 {
-	float yPos=mSnakeActor[ix].y; 
-	yPos-=mSnakeActor[ix].dy;
+	float yPos=mSnakeActor[ix].GetY(); 
+	yPos-=mSnakeActor[ix].GetDy();
 	mIsHit = IsSelfHit();
 	if (!mIsHit)
 	{
-		if (IsBorder(mSnakeActor[ix].x, yPos))
+		if (IsBorder(mSnakeActor[ix].GetX(), yPos))
 		{
-			mSnakeActor[ix].y = mSurfaceHeight - mOriginOffset.y;
+			mSnakeActor[ix].SetY( mSurfaceHeight - mOriginOffset.y);
 			RotateUp(ix);
 		} else {
-			mSnakeActor[ix].y=yPos;
+			mSnakeActor[ix].SetY(yPos);
 			RotateUp(ix);
 		}
 	}
@@ -178,17 +180,17 @@ void SnakePartList::StepUp(int ix)
 
 void SnakePartList::StepDown(int ix)
 {
-	float yPos=mSnakeActor[ix].y; 
-	yPos+=mSnakeActor[ix].dy;
+	float yPos=mSnakeActor[ix].GetY(); 
+	yPos+=mSnakeActor[ix].GetDy();
 	mIsHit = IsSelfHit();
 	if (!mIsHit)
 	{
-		if (IsBorder(mSnakeActor[ix].x, yPos ))
+		if (IsBorder(mSnakeActor[ix].GetX(), yPos ))
 		{
-			mSnakeActor[ix].y = 0 +  mOriginOffset.y;
+			mSnakeActor[ix].SetY( 0 +  mOriginOffset.y);
 			RotateDown(ix);
 		} else {
-			mSnakeActor[ix].y=yPos;
+			mSnakeActor[ix].SetY(yPos);
 			RotateDown(ix);
 		}
 
@@ -205,40 +207,40 @@ bool SnakePartList::IsSelfHit()
 	}
 
 	SnakePart snakePart = mSnakeActor.back();
-	hgeRect headRect = snakePart.GetBoundingBox();
+	shared_ptr<Rect>& headRect = snakePart.GetBoundingBox();
 
-	headRect.x1 += 2;
-	headRect.y1 += 2;
-	headRect.x2 -= 2;
-	headRect.y2 -= 2;
+	headRect->x1 += 2;
+	headRect->y1 += 2;
+	headRect->x2 -= 2;
+	headRect->y2 -= 2;
 
 	bool bRes = FALSE;
 
 	for (vector<SnakePart>::size_type nI = 0; nI < mSnakeActor.size() - 3; nI++)
 	{
-		bRes |= mSnakeActor[nI].IntersectRect(headRect);
+		bRes |= mSnakeActor[nI].IntersectRect(*headRect);
 	}
 
 	return bRes;
 
 }
 
-hgeVertex SnakePartList::GetTailPosition()
+Vertex SnakePartList::GetTailPosition()
 {
 	if (mSnakeActor.empty())
 	{
 		throw std::bad_exception();
 	}
-	hgeVertex res;
+	Vertex res;
 	//idea: the pos can be retrieved with getboundingbox- etc
-	res.x = mSnakeActor.front().x - abs(mOriginOffset.x);
-	res.y = mSnakeActor.front().y - abs(mOriginOffset.y);
+	res.x = mSnakeActor.front().GetX() - abs(mOriginOffset.x);
+	res.y = mSnakeActor.front().GetY() - abs(mOriginOffset.y);
 	return res;
 }
 
-void SnakePartList::Create()
+void SnakePartList::Create( shared_ptr<GameGraphicFactory>& gameGraphicFactory )
 {
-	hgeVertex snakeFramePos;
+	Vertex snakeFramePos;
 	if (InputParameters::Instance().IsDebugAnimation())
 	{
 		snakeFramePos.x = mOriginOffset.x;
@@ -278,38 +280,38 @@ void SnakePartList::Create()
 			}
 		}
 
-		snakePart.x = snakeFramePos.x;
-		snakePart.y =  snakeFramePos.y;
+		snakePart.SetX( snakeFramePos.x );
+		snakePart.SetY( snakeFramePos.y );
 
 		//snakePart.dx = 4;
 		//snakePart.dy = 4;
 		//snakePart.dx = 1.0f;
 		//snakePart.dy = 1.0f;
-		snakePart.dx = mSnakePartWidth;
-		snakePart.dy = mSnakePartWidth;
+		snakePart.SetDx( mSnakePartWidth );
+		snakePart.SetDy( mSnakePartWidth );
 
-		snakePart.rot = 0;
+		snakePart.SetRot( 0 );
 
 		mSnakeActor.push_back(snakePart);
 
 		snakeFramePos.x += mSnakePartWidth;
 	}
 
-	InitSnakeSkin();
+	InitSnakeSkin(gameGraphicFactory);
 }
 
-void SnakePartList::Destroy()
-{
-
-}
+//void SnakePartList::Destroy()
+//{
+//
+//}
 
 bool SnakePartList::IsHeadEvenPosition()
 {
-	hgeVertex r = GetHeadPosition();
+	Vertex r = GetHeadPosition();
 	return IsEvenPosition(r);
 }
 
-bool SnakePartList::IsEvenPosition(const hgeVertex& r)
+bool SnakePartList::IsEvenPosition( const Vertex& r )
 {
 	if ( ( fmod(r.x, mSnakePartWidth) == 0) && (fmod(r.y, mSnakePartHeight) == 0))
 	{
@@ -320,7 +322,7 @@ bool SnakePartList::IsEvenPosition(const hgeVertex& r)
 
 bool SnakePartList::IsTailEvenPosition()
 {
-	hgeVertex r = GetTailPosition();
+	Vertex r = GetTailPosition();
 
 	return IsEvenPosition(r);
 }
@@ -348,17 +350,20 @@ void SnakePartList::Render()
 	}
 }
 
-void SnakePartList::InitSnakeSkin()
+void SnakePartList::InitSnakeSkin( shared_ptr<GameGraphicFactory>& gameGraphicFactory )
 {
 	for (vector<SnakePart>::size_type i = 0; i < mSnakeActor.size(); i++)
 	{
+	    mSnakeActor[i].SetGraphics(gameGraphicFactory);
 		mSnakeActor[i].InitSkin();
 	}
+
+	mGameGraphicFactory =  gameGraphicFactory;
 }
 
 bool SnakePartList::IsBorder()
 {
-	hgeVertex r = GetHeadPosition();
+	Vertex r = GetHeadPosition();
 
 	float nx = mSurfaceWidth  - mSnakePartWidth; // last position for border x
 	float ny = mSurfaceHeight - mSnakePartHeight; // last position for border y
@@ -373,7 +378,7 @@ void SnakePartList::tracePosition(const string& text, int ix)
 {
 #ifdef _DEBUG
 	std::ostringstream stringStream;
-	stringStream << text << "(" << mSnakeActor[ix].GetMorphology() << ")" << "=" << "(" << mSnakeActor[ix].x << "," << mSnakeActor[ix].y <<  ")" <<",";
+	stringStream << text << "(" << mSnakeActor[ix].GetMorphology() << ")" << "=" << "(" << mSnakeActor[ix].GetX() << "," << mSnakeActor[ix].GetY() <<  ")" <<",";
 	std::string copyOfStr = stringStream.str();
 	OutputDebugString(copyOfStr.c_str());
 #endif
@@ -382,22 +387,22 @@ void SnakePartList::tracePosition(const string& text, int ix)
 
 void SnakePartList::RotateLeft(int ix)
 {
-	mSnakeActor[ix].rot = M_PI;
+	mSnakeActor[ix].SetRot( M_PI );
 }
 
 void SnakePartList::RotateRight(int ix)
 {
-	mSnakeActor[ix].rot = 0;
+	mSnakeActor[ix].SetRot(0);
 }
 
 void SnakePartList::RotateUp(int ix)
 {
-	mSnakeActor[ix].rot = -M_PI_2;
+	mSnakeActor[ix].SetRot(-M_PI_2);
 }
 
 void  SnakePartList::RotateDown(int ix)
 {
-	mSnakeActor[ix].rot = M_PI_2;
+	mSnakeActor[ix].SetRot( M_PI_2);
 	//m_SnakeActor[ix].rot = 3 * M_PI /2;
 }
 
@@ -443,7 +448,7 @@ int SnakePartList::GetHeadMorphology()
 	return 	mSnakeActor.back().GetMorphology();;
 }
 
-hgeVertex SnakePartList::GetOriginOffset(void)
+Vertex SnakePartList::GetOriginOffset( void )
 {
 	return mOriginOffset;
 }

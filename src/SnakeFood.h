@@ -20,12 +20,15 @@
 #include <vector>
 using std::vector;
 
-#include "hge.h"
-#include "hgeanim.h"
+//#include "hge.h"
+//#include "hgeanim.h"
 #include <assert.h>
-#include "GameTilesFactory.h"
+#include "GameGraphicFactory.h"
 #include "GamePlay.h"
 #include "InputParameters.h"
+#include "Rect.h"
+#include "Vertex.h"
+using namespace mightysnake;
 
 class SnakeFood : public GamePlay
 {
@@ -40,20 +43,20 @@ public:
         mHeight = nHeight;
         }
 
-	void Create(HGE* pScreen, GameTilesFactory::SnakeTilesType foodTile)
+void Create( shared_ptr<GameGraphicFactory>& graphics, GameGraphicFactory::GameTiles foodTile)
     {
-		assert( 0 != pScreen);
+		//assert( 0 != pScreen);
 
-		mpSnakeFoodSprite = GameTilesFactory::instance().CreateAnimation(foodTile);
+		mpSnakeFoodSprite = graphics->GetSpriteAnimation(foodTile);
 
-		mRangeX = mWidth / (int)GameTilesFactory::instance().GetSnakePartWidth();
-		mRangeY = mHeight / (int)GameTilesFactory::instance().GetSnakePartHeight();
+		mRangeX = mWidth / (int)graphics->GetSnakePartWidth();
+		mRangeY = mHeight / (int)graphics->GetSnakePartHeight();
 
 		//start from zero based index.
 		mRangeX--;
 		mRangeY--;
 
-		int nStep = (int)GameTilesFactory::instance().GetSnakePartWidth();
+		int nStep = (int)graphics->GetSnakePartWidth();
 		int  nSize = max(mRangeX, mRangeY);
 		for (int nI = 0; nI < nSize; nI++)
 			{
@@ -101,7 +104,7 @@ public:
 
     }
 public:
-    hgeVertex GetPosition() { return mPosition;}
+	Vertex GetPosition() { return mPosition;}
 public:
     void UpdateFrame(float deltaTime)
     {
@@ -117,28 +120,19 @@ public:
 		}
     }
 
-    hgeRect GetBoundingBox()
+	shared_ptr<Rect> GetBoundingBox()
     {
-		assert(0 != mpSnakeFoodSprite);
-		hgeRect box;
-		if ( -1 == mPosition.x ||  -1 == mPosition.y) {
-
-			box.Clear();
-		} else {
-			mpSnakeFoodSprite->GetBoundingBox(mPosition.x, mPosition.y, &box);
-		}
-	
-		return box;
+		return mpSnakeFoodSprite->GetBoundingBox(mPosition.x, mPosition.y);
     }
 
 private:
-    hgeVertex mPosition;
+    Vertex mPosition;
     vector<float> mPositionArray;
 
     float mRangeX;
     float mRangeY;
-    hgeAnimation* mpSnakeFoodSprite;
-    HGE* mpScreen;
+	shared_ptr<SpriteAnimation> mpSnakeFoodSprite;
+
 	int x_, y_;
 	int mScorePrice;
 	float mWidth;

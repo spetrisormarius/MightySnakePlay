@@ -16,11 +16,13 @@
  */
  #include "StdAfx.h"
 #include "SnakeContorsionList.h"
+#define _USE_MATH_DEFINES
+#include <cmath>
+using namespace std;
 
-
-SnakeContorsionList::SnakeContorsionList(SnakePartList* snakePartList):
+SnakeContorsionList::SnakeContorsionList( SnakePartList* snakePartList, shared_ptr<GameGraphicFactory>& graphics ) :
 mpSnakePartList(snakePartList),
-mCornerSpace( GameTilesFactory::instance().CreateCornerSpace() )
+mCornerSpace( graphics->CreateCornerSpace() )
 {
 	assert( 0 != mpSnakePartList);
 	
@@ -32,11 +34,12 @@ mCornerSpace( GameTilesFactory::instance().CreateCornerSpace() )
 	sc.nDirection = RIGHT;
 	sc.nStart= 0;
 	sc.nEnd  = mpSnakePartList->GetSize(); 
-	sc.m_CornerPosition = hgeVertex();
-	sc.m_CornerMorphology = SnakePart::SNAKE_PART_HEAD_UP;
+	sc.cornerPosition = Vertex();
+	sc.cornerMorphology = SnakePart::SNAKE_PART_HEAD_UP;
 
 	mContorsion.push_back(sc);
 
+	mGraphics = graphics;
 }
 
 
@@ -202,7 +205,7 @@ void SnakeContorsionList::RenderCornerSpace()
 	{
 		//display at second step until last step -1
 		if ( mContorsion[i].nEnd != mContorsion[i].nStart && mContorsion[i].nStart != 1) {
-			hgeVertex corner = mContorsion[i].m_CornerPosition;
+			Vertex corner = mContorsion[i].cornerPosition;
 			mCornerSpace->Render(corner.x, corner.y);
 			RenderCorners(i);
 		}
@@ -232,7 +235,7 @@ void SnakeContorsionList::Grow( float surfaceWidth, float surfaceHeight, int& gr
 	{
 		if (mpSnakePartList->IsHeadEvenPosition())
 		{
-			hgeVertex offsetPos;
+			Vertex offsetPos;
 			if (IsRoomAvailable(surfaceWidth, surfaceHeight, offsetPos))
 			{
 				//grow - add offset pos
@@ -253,14 +256,14 @@ void SnakeContorsionList::Grow( float surfaceWidth, float surfaceHeight, int& gr
 	}
 }
 
-bool SnakeContorsionList::IsRoomAvailable(int nSurfaceWidth, int nSurfaceHeight, hgeVertex& offsetPos)
+bool SnakeContorsionList::IsRoomAvailable( float nSurfaceWidth, float nSurfaceHeight, Vertex& offsetPos )
 {
 	if (IsLastTailEven())
 	{
 		return false;
 	}
 	assert ( 0 != mpSnakePartList);
-	hgeVertex pos = mpSnakePartList->GetTailPosition();
+	Vertex pos = mpSnakePartList->GetTailPosition();
 
 	bool bRes = false;
 	switch(mContorsion[0].nDirection)
@@ -388,8 +391,8 @@ int SnakeContorsionList::GetContorsionNo(void)
 	}
 
 	if (actualContorsionNo != contorsionNo) {
-		mContorsion[actualContorsionNo].m_CornerPosition = mpSnakePartList->GetHeadPosition();
-		mContorsion[actualContorsionNo].m_CornerMorphology = mpSnakePartList->GetHeadMorphology();
+		mContorsion[actualContorsionNo].cornerPosition = mpSnakePartList->GetHeadPosition();
+		mContorsion[actualContorsionNo].cornerMorphology = mpSnakePartList->GetHeadMorphology();
 		actualContorsionNo++;// +1 is a head contortion that is start=end=sizepart
 	}
 
@@ -400,19 +403,19 @@ void SnakeContorsionList::RenderCorners( int index )
 {
 	assert(0 != mpSnakePartList);
 
-	hgeVertex corner = mContorsion[index].m_CornerPosition;
+	Vertex corner = mContorsion[index].cornerPosition;
 	int direction1 = mContorsion[index-1].nDirection;
 	int direction2 = mContorsion[index].nDirection;
 
-	hgeVertex offset = mpSnakePartList->GetOriginOffset();
+	Vertex offset = mpSnakePartList->GetOriginOffset();
 
-	int cornerMorphology =  mContorsion[index].m_CornerMorphology;
+	int cornerMorphology =  mContorsion[index].cornerMorphology;
 	if( cornerMorphology == SnakePart::SNAKE_PART_HEAD_UP) {
 		mCornerSprite = 
-			GameTilesFactory::instance().GetSpriteTile(GameTilesFactory::TILE_CORNER_DOWN);
+			mGraphics->GetSprite(GameGraphicFactory::TILE_CORNER_DOWN);
 	} else 	if( cornerMorphology == SnakePart::SNAKE_PART_HEAD_DOWN) {
 		mCornerSprite = 
-			GameTilesFactory::instance().GetSpriteTile(GameTilesFactory::TILE_CORNER_UP);
+			mGraphics->GetSprite(GameGraphicFactory::TILE_CORNER_UP);
 	}
 	assert(0 != mCornerSprite);
 

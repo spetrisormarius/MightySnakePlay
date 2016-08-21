@@ -25,7 +25,6 @@ class GamePlay
 public:
 	GamePlay(void) {}
 	virtual ~GamePlay(void) {}
-	virtual void Init(SnakeGame* pGame, HGE* pEngine, float widthSurface, float heightSurface, hgeFont* pFnt) {}
 	virtual bool UpdateFrame(SnakeGame* pGame)
 	{
 		return false;
@@ -33,7 +32,7 @@ public:
 	// draw
 	virtual void Render(SnakeGame* game) {}
 
-	virtual void Destroy(SnakeGame* game) {}
+	//virtual void Destroy(SnakeGame* game) {}
 
 	virtual void Enter(SnakeGame* game) {};
 protected:

@@ -16,15 +16,18 @@
  */
  #pragma once
 
-
-#include "TileInfo.h"
-#include "hge.h"
-#include "hgeanim.h"
+//#include "TileInfo.h"
+//#include "hge.h"
+//#include "hgeanim.h"
 
 #include "GamePlay.h"
 #include "SnakePartList.h"
 #include "SnakeContorsionList.h"
 #include "gametime.h"
+
+#include "Rect.h"
+#include "GameEngine.h"
+using namespace mightysnake;
 
 class SnakeGame;
 
@@ -40,30 +43,47 @@ public:
     virtual void UpdateFrame(float timeEvent) ;
     // draw
     virtual void Render() ;
-	bool IntersectHead(const hgeRect& boundingBox);
-	bool Intersect(const hgeRect& boundingBox);
+	bool IntersectHead(const Rect& boundingBox);
+	bool Intersect(const Rect& boundingBox);
 public:
     void UpdateTurn()
         {
-        assert(0 != mpScreen);
+        //assert(0 != mpScreen);
         assert( 0 != mpSnakeContorsion);
 
-        if(mpScreen->Input_GetKeyState(HGEK_LEFT))
-            {
-            mpSnakeContorsion->Turn(SnakeContorsionList::LEFT);
-            } 
-		else if (mpScreen->Input_GetKeyState(HGEK_RIGHT))
-            {
-            mpSnakeContorsion->Turn(SnakeContorsionList::RIGHT);
-            }
-        else if (mpScreen->Input_GetKeyState(HGEK_UP))
-            {
-            mpSnakeContorsion->Turn(SnakeContorsionList::UP);
-            }
-		else if (mpScreen->Input_GetKeyState(HGEK_DOWN))
-            {
-            mpSnakeContorsion->Turn(SnakeContorsionList::DOWN);
-            }
+  //      if(mpScreen->Input_GetKeyState(HGEK_LEFT))
+  //          {
+  //          mpSnakeContorsion->Turn(SnakeContorsionList::LEFT);
+  //          } 
+		//else if (mpScreen->Input_GetKeyState(HGEK_RIGHT))
+  //          {
+  //          mpSnakeContorsion->Turn(SnakeContorsionList::RIGHT);
+  //          }
+  //      else if (mpScreen->Input_GetKeyState(HGEK_UP))
+  //          {
+  //          mpSnakeContorsion->Turn(SnakeContorsionList::UP);
+  //          }
+		//else if (mpScreen->Input_GetKeyState(HGEK_DOWN))
+  //          {
+  //          mpSnakeContorsion->Turn(SnakeContorsionList::DOWN);
+  //          }
+
+		if(mGameEngine->InputGetKeyState(GameEngine::KEY_LEFT))
+	{
+	    mpSnakeContorsion->Turn(SnakeContorsionList::LEFT);
+	} 
+	else if (mGameEngine->InputGetKeyState(GameEngine::KEY_RIGHT))
+	{
+	    mpSnakeContorsion->Turn(SnakeContorsionList::RIGHT);
+	}
+	else if (mGameEngine->InputGetKeyState(GameEngine::KEY_UP))
+	{
+	   mpSnakeContorsion->Turn(SnakeContorsionList::UP);
+	}
+	else if (mGameEngine->InputGetKeyState(GameEngine::KEY_DOWN))
+	{
+	  mpSnakeContorsion->Turn(SnakeContorsionList::DOWN);
+	}
 
     }
 public:
@@ -89,14 +109,15 @@ private:
     float mSurfaceWidth;
     float mSurfaceHeight;
 private:
-    HGE* mpScreen;
+    //HGE* mpScreen;
+	shared_ptr<GameEngine> mGameEngine;
     SnakeGame* mpGame;
     int mGrowCount;
     SnakePartList* mpSnakePartList;
 	SnakeContorsionList* mpSnakeContorsion;
 public:
 	bool IsHeadEven();
-	hgeVertex& GetHeadPosition();
+	Vertex& GetHeadPosition();
 	void ResetHit();
 private:
 	GameTime mSnakePlayerTimer;

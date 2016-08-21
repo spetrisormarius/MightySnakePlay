@@ -22,18 +22,19 @@
 #include "hgecolor.h"
 #include "SnakePlayer.h"
 #include "SnakeFood.h"
+#include "Font.h"
 
 void GameEnd::Render( SnakeGame* game )
 {
     assert( 0 != game);
 	
 	assert(0 != mpPlayer);
-	assert(0 != mpScreen);
+	//assert(0 != mpScreen);
 
 	assert(0 != mpSnakeFood);
 	assert(0 != mpSnakeHit);
 
-	float timeEvent = mpScreen->Timer_GetDelta();
+	float timeEvent = mGameEngine->TimerGetDelta();
 
 	if ( !mGameOverTimer.IsTime() ) {
 
@@ -80,13 +81,14 @@ void GameEnd::Enter( SnakeGame* game )
 	assert( 0 != mpPlayer);
     mpSnakeFood = game->GetSnakeFood();
 	assert( 0 != mpSnakeFood);
-    mpScreen = game->GetScreen();
-	assert( 0 != mpScreen);
+    //mpScreen = game->GetScreen();
+	mGameEngine = game->GetEngine();
+	assert( 0 != mGameEngine.get());
 
 	if(NULL == mpSnakeHit)
 	{
 	    mpSnakeHit = new SnakeHit();
-	    mpSnakeHit->Create(mpScreen);
+	    mpSnakeHit->Create(game->GetEngine()->GetGraphicFactory());
 	}
 
 	mGameOverTimer.SetTimer(10);
@@ -101,7 +103,7 @@ void GameEnd::Destroy( SnakeGame* game )
 void GameEnd::DisplayGameOver( SnakeGame* pGame )
 {
 	assert( 0 != pGame);
-	hgeFont* pFnt = pGame->GetFont();
+	shared_ptr<Font>& pFnt = pGame->GetFont();
 	assert( 0 != pFnt);
 
 	float heightFont = pFnt->GetHeight();
@@ -123,18 +125,18 @@ void GameEnd::DisplayGameOver( SnakeGame* pGame )
 		hgeColor greyColor(0.25, 0.25, 0.25, 1);
 		pFnt->SetScale(2.2f);
 		pFnt->SetColor(greyColor.GetHWColor());
-		pFnt->Render(surfaceWidth / 2.0f + 2 , surfaceHeight / 3.0f + 2, HGETEXT_CENTER, masterSnake.c_str() );
+		pFnt->Render(surfaceWidth / 2.0f + 2 , surfaceHeight / 3.0f + 2, Font::TEXT_CENTER, masterSnake.c_str() );
 
 		hgeColor redColor(1, 0, 0, 1);
 		pFnt->SetColor(redColor.GetHWColor());
-		pFnt->Render(surfaceWidth / 2.0f , surfaceHeight / 3.0f, HGETEXT_CENTER, masterSnake.c_str() );
+		pFnt->Render(surfaceWidth / 2.0f , surfaceHeight / 3.0f, Font::TEXT_CENTER, masterSnake.c_str() );
 
 		//render high score
 		pFnt->SetColor(greyColor.GetHWColor());
-		pFnt->Render(surfaceWidth / 2.0f + 2 , surfaceHeight - surfaceHeight / 3.0f + 2, HGETEXT_CENTER,strScore.c_str() );
+		pFnt->Render(surfaceWidth / 2.0f + 2 , surfaceHeight - surfaceHeight / 3.0f + 2, Font::TEXT_CENTER,strScore.c_str() );
 
 		pFnt->SetColor(redColor.GetHWColor());
-		pFnt->Render(surfaceWidth / 2.0f , surfaceHeight - surfaceHeight / 3.0f , HGETEXT_CENTER,strScore.c_str() );
+		pFnt->Render(surfaceWidth / 2.0f , surfaceHeight - surfaceHeight / 3.0f , Font::TEXT_CENTER,strScore.c_str() );
 
 	} else {
 		//render your score
@@ -143,11 +145,11 @@ void GameEnd::DisplayGameOver( SnakeGame* pGame )
 		pFnt->SetColor(yellowColor.GetHWColor());
 		pFnt->SetScale(1.7f);
 		//float widthYourScore = mFnt->GetStringWidth(yourScore.c_str(), false);
-		pFnt->Render(surfaceWidth / 2.0f , surfaceHeight / 3.0f, HGETEXT_CENTER, yourScore.c_str() );
+		pFnt->Render(surfaceWidth / 2.0f , surfaceHeight / 3.0f, Font::TEXT_CENTER, yourScore.c_str() );
 
 		//render score
-		float widthScore = pFnt->GetStringWidth(strScore.c_str(), false);
-		pFnt->Render(surfaceWidth / 2.0f, surfaceHeight - surfaceHeight / 3.0f , HGETEXT_CENTER, strScore.c_str() );
+		float widthScore = pFnt->GetStringWidth(strScore.c_str());
+		pFnt->Render(surfaceWidth / 2.0f, surfaceHeight - surfaceHeight / 3.0f , Font::TEXT_CENTER, strScore.c_str() );
 
 	}
 }

@@ -18,9 +18,11 @@
 #include "GameMain.h"
 #include "surface.h"
 #include "InputParameters.h"
+#include "GameEngine.h"
 
-GameMain::GameMain(void):
-mpEngine(0)
+
+GameMain::GameMain(void)
+//mpEngine(0)
 {
 
 }
@@ -31,89 +33,50 @@ GameMain::~GameMain(void)
 
 bool GameMain::Create(void)
 {
-	// Here we use global pointer to HGE interface.
-	// Instead you may use hgeCreate() every
-	// time you need access to HGE. Just be sure to
-	// have a corresponding mEngine->Release()
-	// for each call to hgeCreate()
-	mpEngine = hgeCreate(HGE_VERSION);
+	shared_ptr<GameEngine> hgeEngine = GameEngineFactory::getEngine(mightysnake::GameEngineFactory::HGE);                       
 
-	// Set our frame function
-	mpEngine->System_SetState(HGE_FRAMEFUNC, &GameMain::FrameFunc);
+	hgeEngine->Create();
 
-	// Set the window title
-	mpEngine->System_SetState(HGE_TITLE, "MightySnake");
-
-	mpEngine->System_SetState(HGE_RENDERFUNC, &GameMain::RenderFunc);
-
-	// Run in windowed mode
-	// Default window size is 800x600
-	mpEngine->System_SetState(HGE_WINDOWED, true);
-
-	// Don't use BASS for sound
-	/*mEngine->System_SetState(HGE_USESOUND, false);*/
-
-#ifdef _DEBUG
-    mpEngine->System_SetState(HGE_LOGFILE, "MightySnake.log");
-#else 
-	if (InputParameters::Instance().IsDebug())
-	{
-		mpEngine->System_SetState(HGE_LOGFILE, "MightySnake.log");
-	}
-#endif
-
-	mpEngine->System_SetState(HGE_FPS, 30);
-	
-	mpEngine->System_SetState(HGE_SCREENWIDTH, SURF_W);
-	mpEngine->System_SetState(HGE_SCREENHEIGHT, SURF_H2);
-
-	mpEngine->System_SetState(HGE_SCREENBPP, 32);
-	
-	mpEngine->System_SetState(HGE_SHOWSPLASH, false);
-
-	bool bRes = mpEngine->System_Initiate();
-	if (!bRes)
-	{
-		return false;
-	}
-
-#ifdef NDEBUG
-	bRes = mpEngine->Resource_AttachPack("mysnk.cat", "..1.5.9.0.....");
-	if (!bRes)
-	{
-		return false;
-	}
-#endif
+	hgeEngine->SetUpdater(&GameMain::FrameFunc);
+	hgeEngine->SetRenderer(&GameMain::RenderFunc);
 
 	// Load the font, create the cursor sprite
-	mpFnt=new hgeFont("font1.fnt");
+	//mpFnt=new hgeFont("font1.fnt");
+    mFnt= hgeEngine->GetFont();
 
-	mSnakeGame.Init( mpEngine, SURF_W, SURF_H, mpFnt );
+	mSnakeGame.SetSurfaceDimension(SURF_W, SURF_H);
+    mSnakeGame.SetFont(mFnt);
+	mSnakeGame.Init( hgeEngine );
 
 	return true;
 }
 
 void GameMain::Destroy(void)
 {
-	if ( 0 == mpEngine )
-	{
-		return;
-	}
+	mSnakeGame.PersistHighScore();
 
-	mSnakeGame.Destroy();
+	//shared_ptr<GameEngine> hgeEngine = GameEngineFactory::getEngine(mightysnake::GameEngineFactory::HGE);                       
+	//hgeEngine->Destroy();
+
+	//if ( 0 == mpEngine )
+	//{
+	//	return;
+	//}
+
+	//mSnakeGame.Destroy();
   
-	delete mpFnt;
-	mpFnt = NULL;
+	//delete mpFnt;
+	//mpFnt = NULL;
 
-	// Restore video mode and free
-	// all allocated resources
-	mpEngine->System_Shutdown();
+	//// Restore video mode and free
+	//// all allocated resources
+	//mpEngine->System_Shutdown();
 
-	// Release the HGE interface.
-	// If there are no more references,
-	// the HGE object will be deleted.
-	mpEngine->Release();
-	mpEngine = NULL;
+	//// Release the HGE interface.
+	//// If there are no more references,
+	//// the HGE object will be deleted.
+	//mpEngine->Release();
+	//mpEngine = NULL;
 }
 
 bool GameMain::Run()
@@ -122,7 +85,7 @@ bool GameMain::Run()
 	// Note that the execution "stops" here
 	// until "true" is returned from FrameFunc().
 
-	mpEngine->System_Start();
+	GameEngineFactory::getEngine(mightysnake::GameEngineFactory::HGE)->Start();                       
 
 	return true;
 }
@@ -148,7 +111,7 @@ bool GameMain::RenderFunc()
 void GameMain::ErrorMessage()
 {
 	// If HGE initialization failed show error message
-	MessageBox(NULL, mpEngine->System_GetErrorMessage(), "Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
+	//MessageBox(NULL, mpEngine->System_GetErrorMessage(), "Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
 }
 
 GameMain& GameMain::GetInstance()
@@ -160,8 +123,8 @@ GameMain& GameMain::GetInstance()
 
 bool GameMain::UpdateFrame()
 {
-	// By returning "true" we tell HGE
-	// to stop running the application.
+	 //By returning "true" we tell HGE
+	 //to stop running the application.
 	mSnakeGame.UpdateFrame();
 
 	return false;
@@ -169,12 +132,22 @@ bool GameMain::UpdateFrame()
 
 void GameMain::Render()
 {
-	assert( 0 != mpEngine);
-	// Render graphics
-	mpEngine->Gfx_BeginScene();
-	mpEngine->Gfx_Clear(0);
+
+	shared_ptr<GameEngine> hgeEngine = GameEngineFactory::getEngine(mightysnake::GameEngineFactory::HGE);  
+
+	hgeEngine->StartRender();
 
 	mSnakeGame.Render();
 
-	mpEngine->Gfx_EndScene();
+	hgeEngine->EndRender();
+
+
+	//assert( 0 != mpEngine);
+	// Render graphics
+	//mpEngine->Gfx_BeginScene();
+	//mpEngine->Gfx_Clear(0);
+
+	//mSnakeGame.Render();
+
+	//mpEngine->Gfx_EndScene();
 }

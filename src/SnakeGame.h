@@ -21,12 +21,14 @@ class SnakePlayer;
 class SnakeFood;
 //class SnakeHit;
 
-#include "hge.h"
+//#include "hge.h"
 #include "TileInfo.h"
 #include <vector>
 using std::vector;
-#include "hgesprite.h"
-#include "hgefont.h"
+//#include "hgesprite.h"
+//#include "hgefont.h"
+#include "GameEngine.h"
+#include "Font.h"
 
 using namespace std::tr1;
 using namespace std;
@@ -38,23 +40,21 @@ public:
 public:
     virtual ~SnakeGame(void);
 public:
-	int Init(HGE* pEngine, float widthSurface, float heightSurface, hgeFont* pFnt);
+	int Init(shared_ptr<GameEngine> gameEngine);
 
 	//game logic: update position, get input
 	bool UpdateFrame();
 	// draw
 	void Render();
 public:
-	void Create(HGE*  pEngine);
+	void Create();
 public:
 	void GetSurfaceDimension(float& width, float& height);
     void SetSurfaceDimension(float Width, float Height);
-	hgeFont* GetFont();
+	shared_ptr<Font>& GetFont();
 public:
-    HGE* GetScreen(void);
+	shared_ptr<GameEngine> GetEngine(void);
     int GetHighScore() {return mHighScore;}
-public:
-    void OnDestroy(void);
 public:
 	void PersistHighScore(void);
 private:
@@ -62,7 +62,7 @@ private:
     int ChangeState(GamePlay* state);
     GamePlay* mpState;
 private:
-    HGE* mpScreen;
+    shared_ptr<GameEngine> mGameEngine;
 private:
     float mSurfaceWidth;
     float mSurfaceHeight;
@@ -72,9 +72,9 @@ private:
 public:
 	void LoadHighScore(void);
 public:
-	void SetFont( hgeFont*  pFnt );
+	void SetFont( shared_ptr<Font>& pFnt );
 private:
-	hgeFont	*mFnt;
+	shared_ptr<Font> mFnt;
 private:
 	string GetKey(void);
 	string GetEncryptedHighScore(string highScore);
@@ -83,7 +83,6 @@ private:
 public:
 	void SetLevel( short level );
 public:
-	void Destroy(void);
 	void SetHighScore( int score );
 	SnakePlayer* GetSnakePlayer() 
 	{
@@ -95,6 +94,7 @@ public:
 	}
 	void SetScore( int score );
 private:
+	void Destroy(void);
 	SnakePlayer* mpPlayer;
 	SnakeFood* mpSnakeFood;
 public:

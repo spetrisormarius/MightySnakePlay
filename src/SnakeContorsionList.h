@@ -15,17 +15,20 @@
  * along with MightySnake.  If not, see <http://www.gnu.org/licenses/>.
  */
  #pragma once
-#include "hge.h"
-#include "hgeanim.h"
+//#include "hge.h"
+//#include "hgeanim.h"
 #include<vector>
 using namespace std;
+
+#include "Vertex.h"
+using namespace mightysnake;
 
 #include "SnakePartList.h"
 
 class SnakeContorsionList
 {
 public:
-	SnakeContorsionList(SnakePartList* snakePartList);
+	SnakeContorsionList(SnakePartList* snakePartList, shared_ptr<GameGraphicFactory>& graphics);
 	~SnakeContorsionList(void);
 
 	enum E_Direction
@@ -39,8 +42,8 @@ public:
 	struct SnakeContorsion
 	{
 		int nStart,nEnd,nDirection;
-		hgeVertex m_CornerPosition;
-		int m_CornerMorphology;
+		Vertex cornerPosition;
+		int cornerMorphology;
 	};
 
 	enum CornerDirection
@@ -66,7 +69,7 @@ private:
 	void UpdateContorsionPart();
 	void UpdateContorsion();
 	
-	bool IsRoomAvailable(int nSurfaceWidth, int nSurfaceHeight, hgeVertex& offsetPos);
+	bool IsRoomAvailable(float nSurfaceWidth, float nSurfaceHeight, Vertex& offsetPos);
 	bool IsLastTailEven();
 
 	void UpdateFrame(float fDeltaTime);
@@ -76,8 +79,9 @@ private:
 	E_Direction mCurrentDirection;
 	void UpdatePosition();
 
-	shared_ptr<hgeSprite> mCornerSpace;
-	shared_ptr<hgeSprite> mCornerSprite;
+	shared_ptr<Sprite> mCornerSpace;
+	shared_ptr<Sprite> mCornerSprite;
+	shared_ptr<GameGraphicFactory> mGraphics;
 public:
 	void RenderCornerSpace();
 

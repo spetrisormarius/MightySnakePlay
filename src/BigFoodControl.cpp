@@ -23,7 +23,7 @@ mProgressTic (1.0f),
 mSliderIndex (10),
 mpSlider(NULL),
 mpSnakeBigFood(NULL),
-m_nBigFoodIndex (0)
+mBigFoodIndex (0)
 {
 }
 
@@ -33,7 +33,7 @@ BigFoodControl::~BigFoodControl(void)
 	mpSnakeBigFood = 0;
 }
 
-void BigFoodControl::Create( HGE* screen, float surfaceWidth, float surfaceHeight, float surfaceHeightOffset )
+void BigFoodControl::Create( shared_ptr<GameGraphicFactory>& graphics, float surfaceWidth, float surfaceHeight, float surfaceHeightOffset )
 {
 	if ( NULL == mpSlider)
 	{
@@ -47,11 +47,12 @@ void BigFoodControl::Create( HGE* screen, float surfaceWidth, float surfaceHeigh
 	{
 		mpSnakeBigFood = new SnakeFood();
 		mpSnakeBigFood->SetFoodRange(surfaceWidth, surfaceHeight);
-		mpSnakeBigFood->Create(screen, GameTilesFactory::TILE_TYPE_BIG_FOOD);
+		mpSnakeBigFood->Create(graphics, GameGraphicFactory::TILE_BIG_FOOD);
 		mpSnakeBigFood->SetScorePrice(10);
 	}
 
-	m_nSurfaceHeight = surfaceHeight;
+	mSurfaceHeight = surfaceHeight;
+	mGraphics = graphics;
 }
 
 
@@ -106,34 +107,34 @@ void BigFoodControl::Generate( SnakePlayer* player )
 	assert( 0 != player);
 	assert( 0 != mpSnakeBigFood);
 
-	m_nBigFoodIndex++;
-	if ( 5 == m_nBigFoodIndex )
+	mBigFoodIndex++;
+	if ( 5 == mBigFoodIndex )
 	{
 		mpSnakeBigFood->Generate();
-		hgeRect bigFoodRect = mpSnakeBigFood->GetBoundingBox();
+		Rect& bigFoodRect = *mpSnakeBigFood->GetBoundingBox();
 		while (player->Intersect(bigFoodRect) || BigFoodFilter(bigFoodRect))
 		{
 			mpSnakeBigFood->Generate();
-            bigFoodRect = mpSnakeBigFood->GetBoundingBox();
+            bigFoodRect = *mpSnakeBigFood->GetBoundingBox();
 		}
-		m_nBigFoodIndex = 0;
+		mBigFoodIndex = 0;
 		mBigFoodTimer.SetTimer(mBigFoodTic);
 		mProgressTimer.SetTimer(mProgressTic);
 	}
 }
 
-bool BigFoodControl::BigFoodFilter( hgeRect bigFoodRect )
+bool BigFoodControl::BigFoodFilter( const Rect& bigFoodRect )
 {
-	float snakePartHeight = GameTilesFactory::instance().GetSnakePartHeight();
+	float snakePartHeight = mGraphics->GetSnakePartHeight();
 
-	return bigFoodRect.y1 == (m_nSurfaceHeight - snakePartHeight);
+	return bigFoodRect.y1 == (mSurfaceHeight - snakePartHeight);
 }
 
 void BigFoodControl::OnStart(void)
 {
     assert( 0 != mpSlider);
 
-	m_nBigFoodIndex = 0;
+	mBigFoodIndex = 0;
     mSliderIndex  = 10;
 	mpSlider->SetValue(mSliderIndex);
 	mBigFoodTimer.Reset();
@@ -144,7 +145,7 @@ void BigFoodControl::OnStart(void)
 int BigFoodControl::LaunchTime( SnakePlayer* player )
 {
     int nScore = 0;
-	if (mBigFoodTimer.IsEnable() && player->IntersectHead(mpSnakeBigFood->GetBoundingBox()))
+	if (mBigFoodTimer.IsEnable() && player->IntersectHead(*mpSnakeBigFood->GetBoundingBox()))
 	{
 		nScore += mpSnakeBigFood->GetScorePrice();
 		mSliderIndex = 10;

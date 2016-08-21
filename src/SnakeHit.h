@@ -15,10 +15,13 @@
  * along with MightySnake.  If not, see <http://www.gnu.org/licenses/>.
  */
  #pragma once
-#include "hge.h"
+//#include "hge.h"
 #include <assert.h>
-#include "GameTilesFactory.h"
+#include "GameGraphicFactory.h"
 #include "GamePlay.h"
+#include "Vertex.h"
+
+using namespace mightysnake;
 
 class SnakeHit : public GamePlay
 {
@@ -32,20 +35,20 @@ public:
 public:
 	~SnakeHit(void);
 public:
-	void Create(HGE* pScreen)
+	void Create(shared_ptr<GameGraphicFactory>& graphics)
 	{
-	assert(pScreen != 0);
-	mpScreen = pScreen;
+	//assert(pScreen != 0);
+	//mpScreen = pScreen;
 	
-	mpSnakeHitSprite = GameTilesFactory::instance().CreateAnimation(GameTilesFactory::TILE_TYPE_HIT);
+	mpSnakeHitSprite = graphics->GetSpriteAnimation(GameGraphicFactory::TILE_HIT);
 
-	mpSnakeHitSprite->SetMode( HGEANIM_LOOP | HGEANIM_PINGPONG );
+	mpSnakeHitSprite->SetMode( SpriteAnimation::ANIM_LOOP | SpriteAnimation::ANIM_PINGPONG );
 
 	}
 public:
 	void UpdateFrame(float fDeltaTime)
 	{
-	assert ( 0 != mpScreen );
+	//assert ( 0 != mpScreen );
 	assert ( 0 != mpSnakeHitSprite );
 
 	mpSnakeHitSprite->Update( fDeltaTime );
@@ -56,7 +59,7 @@ public:
 		mpSnakeHitSprite->Render(mPosition.x, mPosition.y);
 	}
 
-	void UpdatePosition(const hgeVertex& point)	
+	void UpdatePosition(const Vertex& point)	
 	{
 		mPosition = point;
 	}
@@ -77,8 +80,8 @@ public:
 	}
 
 private:
-	HGE* mpScreen;	
-	hgeAnimation* mpSnakeHitSprite;
+	//HGE* mpScreen;	
+	shared_ptr<SpriteAnimation> mpSnakeHitSprite;
 	int mAnimationState;
-	hgeVertex mPosition;
+	Vertex mPosition;
 };

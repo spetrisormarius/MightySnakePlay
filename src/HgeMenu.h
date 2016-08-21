@@ -15,49 +15,49 @@
  * along with MightySnake.  If not, see <http://www.gnu.org/licenses/>.
  */
  #pragma once
-#include "GamePlay.h"
-#include "gametime.h"
-#include "GameEngine.h"
+#include "hgegui.h"
+#include "hgefont.h"
+#include "hgeguictrls.h"
 
-class SnakeFood;
-class SnakePlayer;
-class SnakeHit;
-using namespace mightysnake;
+#include <vector>
+#include <string>
+#include <memory>
+using namespace std;
+using namespace std::tr1;
 
-class GameEnd: public GamePlay
+#include "Menu.h"
+class MenuAction;
+
+namespace mightysnake 
 {
-protected:
-	GameEnd(void):	
-		 mpPlayer(NULL),
-		 mpSnakeFood( NULL ),
-		 mpSnakeHit(NULL)
-	{
 
-	}
+	class HgeMenu : public Menu
+{
 public:
-	~GameEnd(void)
-	{
-		Destroy(NULL);
-	}
+	HgeMenu(MenuAction& pAction ,HGE * pEngine, hgeFont* pFont);
+	~HgeMenu(void);
+	void Render(void);
+	bool UpdateInput(void);
 public:
-	static GamePlay* Instance(void)
-	{
-		static GameEnd game;
-		return &game;
-	}
-	// draw
-	virtual void Render(SnakeGame* game);
-	virtual void Enter(SnakeGame* game);
+	bool Create(void);
+public:
+	void Destroy(void);
 private:
-	void Destroy(SnakeGame* game);
-	void DisplayGameOver(SnakeGame* pGame);
-private:
-	SnakePlayer* mpPlayer;
-	SnakeFood* mpSnakeFood;
-	shared_ptr<GameEngine> mGameEngine;
+	// Some resource handles
+	HEFFECT mSnd;
+	HTEXTURE mCursor;
 
-	SnakeHit* mpSnakeHit;
-	GameTime mGameOverTimer;
+	// Pointers to the HGE objects we will use
+	hgeGUI *mpGui;
+	hgeFont	*mpFnt;
+	hgeSprite *mpSprCursor;
+
+	HGE* mpEngine;
 	
+	MenuAction& mMenuAction;
+	vector<string> mLevels;
+	int mLevelIndex;
+	int mMaxLevelIndex;
 };
 
+}

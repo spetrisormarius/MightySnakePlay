@@ -15,24 +15,31 @@
  * along with MightySnake.  If not, see <http://www.gnu.org/licenses/>.
  */
  #pragma once
-#include "GameMenu.h"
+//#include "HgeMenu.h"
 #include "MenuAction.h"
-#include "hgesprite.h"
+//#include "hgesprite.h"
 #include <memory>
 #include <sstream>
 #include "hgecolor.h"
-#include "GameTilesFactory.h"
+#include "GameGraphicFactory.h"
 using namespace std;
 using namespace std::tr1;
+
+#include "Sprite.h"
+#include "Menu.h"
+#include "Font.h"
+
+using namespace mightysnake;
+
 
 class SnakeMainScreen
 {
 public:
 
-	SnakeMainScreen(MenuAction* menuAction):mMenu(0), mHighScore(0)
+	SnakeMainScreen(MenuAction& menuAction):
+	  mHighScore(0),
+	  mMenuAction (menuAction)
 	{
-		assert(0 != menuAction);
-		mMenuAction = menuAction;
 	}
 
 	~SnakeMainScreen(void)
@@ -40,20 +47,19 @@ public:
 
 	}
 
-	void Init(HGE* engine, hgeFont* fnt) {
+	void Init(shared_ptr<GameEngine> engine, shared_ptr<Font>& fnt) {
 		assert ( 0 != fnt);
 		assert ( 0 != engine);
 
-		mMenu=  new GameMenu(mMenuAction, engine, fnt);
+		mMenu = engine->GetMenu(mMenuAction);
 
 		if ( !mMenu->Create() )
 		{
-			engine->System_Shutdown();
-			engine->Release();
-			//return false;
+			engine->Destroy();
+			return;
 		}
 
-		mStartLogoSprite = GameTilesFactory::instance().CreateStartLogo();
+		mStartLogoSprite = engine->GetGraphicFactory()->CreateStartLogo();
 		mFnt = fnt;
 	}
 
@@ -79,9 +85,10 @@ public:
 
 	virtual void Destroy() 
 	{
-		if ( 0 != mMenu)
+		if ( 0 != mMenu.get())
 		{
 			mMenu->Destroy();
+			mMenu.reset();
 		}
 	}
     void DisplayStartLogo() 
@@ -105,7 +112,8 @@ public:
 		hgeColor whiteColor(1, 1, 1, 1);
 		mFnt->SetColor(whiteColor.GetHWColor());
 		mFnt->SetScale(0.5f);
-		mFnt->Render( 2 , 2, HGETEXT_LEFT, masterSnake.c_str() );
+		mFnt->Render( 2 , 2, Font::TEXT_LEFT, masterSnake.c_str() );
+          
 
 	}
 	void DisplayMissionInfo(void)
@@ -116,8 +124,8 @@ public:
 		hgeColor whiteColor(1, 1, 1, 1);
 		mFnt->SetColor(whiteColor.GetHWColor());
 		mFnt->SetScale(0.6f);
-		float width = mFnt->GetStringWidth(snakeMission.c_str(), false);
-		mFnt->Render(mSurfaceWidth / 2.0f  , mSurfaceHeight - mSurfaceHeight / 8.0f, HGETEXT_CENTER, snakeMission.c_str() );
+		float width = mFnt->GetStringWidth(snakeMission.c_str());
+		mFnt->Render(mSurfaceWidth / 2.0f  , mSurfaceHeight - mSurfaceHeight / 8.0f, Font::TEXT_CENTER, snakeMission.c_str() );
 
 	}
 
@@ -126,10 +134,10 @@ public:
 		string credits = "spetrisormarius@yahoo.com";
 		hgeColor whiteColor(1, 1, 1, 0.3f);
 		mFnt->SetColor(whiteColor.GetHWColor());
-		mFnt->SetBlendMode(BLEND_DEFAULT_Z);
+		//mFnt->SetBlendMode(BLEND_DEFAULT_Z);
 		mFnt->SetScale(0.4f);
 		float heightFont = mFnt->GetHeight() * mFnt->GetScale();
-		mFnt->Render(0, mSurfaceHeight + 20 - heightFont, HGETEXT_LEFT, credits.c_str() );
+		mFnt->Render(0, mSurfaceHeight + 20 - heightFont, Font::TEXT_LEFT, credits.c_str() );
 
 	}
 
@@ -146,10 +154,11 @@ public:
 
 
 private:
-	GameMenu* mMenu;
-	MenuAction* mMenuAction;
-	shared_ptr<hgeSprite> mStartLogoSprite;
-	hgeFont* mFnt;
+	shared_ptr<Menu> mMenu;
+	MenuAction& mMenuAction;
+	shared_ptr<Sprite> mStartLogoSprite;
+     shared_ptr<Font> mFnt;
+
 	int mHighScore;
 	float  mSurfaceWidth;
 	float mSurfaceHeight;

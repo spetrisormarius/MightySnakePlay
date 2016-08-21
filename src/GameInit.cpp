@@ -19,24 +19,6 @@
 #include "GameInit.h"
 #include "gamerun.h"
 
-//TODO:refactor with enter state. init in game apoi change state si enter state.
-void GameInit::Init(SnakeGame* game, HGE* engine, float widthSurface, float heightSurface, hgeFont* fnt) 
-{
-	//create window create input
-	if (game)
-	{
-		game->SetSurfaceDimension(widthSurface, heightSurface);
-		game->SetFont(fnt);
-		game->LoadHighScore();
-		game->Create(engine);
-		mSnakeMainScreen.Init(engine, fnt);
-        mSnakeMainScreen.SetDimension(widthSurface, heightSurface);
-        mSnakeMainScreen.SetHighScore( game->GetHighScore() );
-
-		mpGame = game;
-	}
-};
-
 bool GameInit::UpdateFrame(SnakeGame* game)
 {
 	//create window create input
@@ -65,10 +47,6 @@ void GameInit::UpdateMainScreen(void)
 void GameInit::Destroy(SnakeGame* game) 
 {
 	mSnakeMainScreen.Destroy();
-	if (game)
-	{
-		game->OnDestroy();
-	}
 }
 
 void GameInit::OnPlay()
@@ -87,4 +65,24 @@ void GameInit::OnLevel( short level )
 	{
 		mpGame->SetLevel(level);
 	}
+}
+
+void GameInit::Enter( SnakeGame* game )
+{
+		//create window create input
+		if (game)
+		{
+			//game->SetSurfaceDimension(widthSurface, heightSurface);
+			//game->SetFont(fnt);
+			game->Create();
+			game->LoadHighScore();
+
+			mSnakeMainScreen.Init(game->GetEngine(), game->GetFont());
+			float widthSurface, heightSurface;
+            game->GetSurfaceDimension(widthSurface, heightSurface);
+			mSnakeMainScreen.SetDimension(widthSurface, heightSurface);
+			mSnakeMainScreen.SetHighScore( game->GetHighScore() );
+
+			mpGame = game;
+		}
 }

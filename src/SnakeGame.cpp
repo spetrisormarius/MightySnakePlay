@@ -17,32 +17,39 @@
  #include "StdAfx.h"
 #include "SnakeGame.h"
 #include "GameInit.h"
-#include "GameTilesFactory.h"
+#include "GameGraphicFactory.h"
 #include <fstream>
 
 using namespace std;
 
 SnakeGame::SnakeGame()
 : mpPlayer(NULL),
-  mpScreen ( 0 ),
   mpSnakeFood( NULL ),
-  mFnt(0),
   mScore(0),
   mHighScore(0),
   mSnakeSpeed(0.2f),
-  mLevel(0)
+  mLevel(0),
+  mSurfaceWidth(0),
+  mSurfaceHeight(0)
 {
     mpState = GameInit::Instance();
 }
 
 SnakeGame::~SnakeGame(void)
 {
-	OnDestroy();
+	Destroy();
 }
 
-int SnakeGame::Init( HGE* pEngine, float widthSurface, float heightSurface, hgeFont* pFnt )
+int SnakeGame::Init( shared_ptr<GameEngine> gameEngine )
 {
-    mpState->Init(this, pEngine, widthSurface, heightSurface, pFnt);
+	assert( 0 != gameEngine);
+	assert( 0 != mSurfaceWidth);
+	assert( 0 != mSurfaceHeight);
+	assert( 0 != mFnt);
+
+	mGameEngine = gameEngine;
+
+    mpState->Enter(this);
 
     return 0;
 }
@@ -53,26 +60,12 @@ int SnakeGame::ChangeState(GamePlay* state)
     return 0;
 }
         
-void SnakeGame::Create( HGE* pEngine )
+void SnakeGame::Create()
 {
-	mpScreen = pEngine;
-
-	if ( 0 == mpScreen)
-	{
-		MessageBox(NULL, "Game error: Create player", "Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
-		return;
-	}
-
-	GameTilesFactory::init(mpScreen);
 	if (0 == mFnt) {
 		MessageBox(NULL, "Game error: Font missing", "Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
 	}
 	 
-}
-
-HGE* SnakeGame::GetScreen(void)
-{
-    return mpScreen;
 }
 
 void SnakeGame::GetSurfaceDimension( float& width, float& height )
@@ -87,32 +80,32 @@ void SnakeGame::SetSurfaceDimension(float Width, float Height)
     mSurfaceHeight = Height;
 }	
 
-void SnakeGame::OnDestroy(void)
-{
-	mFnt = 0;
-}
-
-void SnakeGame::SetFont( hgeFont* pFnt )
+void SnakeGame::SetFont( shared_ptr<Font>& pFnt )
 {
 	mFnt = pFnt;
 }
 
-hgeFont* SnakeGame::GetFont()
+shared_ptr<Font>& SnakeGame::GetFont()
 {
 	return mFnt;
 }
 
 void SnakeGame::PersistHighScore(void)
 {
-  stringstream ss;
-  ss << mHighScore;
-  string highScore = ss.str();
+	try {
+	  stringstream ss;
+	  ss << mHighScore;
+	  string highScore = ss.str();
 
-  highScore = GetEncryptedHighScore(highScore);
+	  highScore = GetEncryptedHighScore(highScore);
 
-  ofstream out("mysnk.dat");
-  out << highScore;
-  out.close();
+	  ofstream out("mysnk.dat");
+	  out << highScore;
+	  out.close();
+	} 
+	catch(...) {
+		MessageBox(NULL, "Game error: Font missing", "Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
+	}
 
 }
 
@@ -121,9 +114,10 @@ string SnakeGame::GetKey(void)
 	unsigned char k1[KEY_LEN + 1] = {110, 137, 130, 175, 8,  82,  60,  99,  42, 141,  19,  94, 233,  44, 114, 0};
 
 	string key(k1, k1+KEY_LEN);
-	stringstream ss;
-	ss << key;
-	return ss.str();
+	//stringstream ss;
+	//ss << key;
+	//return ss.str();
+	return key;
 }
 
 void SnakeGame::LoadHighScore(void)
@@ -181,19 +175,20 @@ void SnakeGame::SetLevel( short level )
 //game logic: update position, get input
 bool SnakeGame::UpdateFrame()
 {
+	assert( 0 != mpState);
 	return mpState->UpdateFrame(this);
 };
 
 // draw
 void SnakeGame::Render() {
+	assert( 0 != mpState);
 	mpState->Render(this);
 }
 
 
 void SnakeGame::Destroy(void)
 {
-	PersistHighScore();
-	mpState->Destroy(this);
+	/*PersistHighScore();*/
 }
 
 void SnakeGame::SetHighScore( int score )
@@ -229,4 +224,9 @@ void SnakeGame::SetPlayer( SnakePlayer* pPlayer )
 void SnakeGame::SetSnakeFood( SnakeFood* pSnakeFood )
 {
 	mpSnakeFood = pSnakeFood;
+}
+
+shared_ptr<GameEngine> SnakeGame::GetEngine( void )
+{
+return mGameEngine;
 }

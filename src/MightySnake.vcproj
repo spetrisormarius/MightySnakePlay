@@ -46,7 +46,7 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -96,7 +96,7 @@
 			OutputDirectory="..\bin\$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			CharacterSet="0"
+			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -122,7 +122,7 @@
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -187,15 +187,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GameEngine.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GameGraphicFactory.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\GameInit.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\GameMain.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\GameMenu.cpp"
 				>
 			</File>
 			<File
@@ -207,11 +211,47 @@
 				>
 			</File>
 			<File
-				RelativePath=".\GameTilesFactory.cpp"
+				RelativePath=".\HgeGameEngine.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\HgeGraphicFactory.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\HgeLabel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\HgeMenu.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\HgeRect.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\HgeSlider.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\HgeSprite.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\HgeSpriteAnimation.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\InputParameters.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Label.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Menu.cpp"
 				>
 			</File>
 			<File
@@ -220,6 +260,10 @@
 			</File>
 			<File
 				RelativePath=".\MightySnake.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Rect.cpp"
 				>
 			</File>
 			<File
@@ -247,6 +291,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Sprite.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SpriteAnimation.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -270,6 +322,10 @@
 				RelativePath=".\Trace.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\Vertex.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -281,7 +337,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Font.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GameEnd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GameEngine.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GameEngineFactory.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GameGraphicFactory.h"
 				>
 			</File>
 			<File
@@ -293,10 +365,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\GameMenu.h"
-				>
-			</File>
-			<File
 				RelativePath=".\GamePlay.h"
 				>
 			</File>
@@ -305,15 +373,55 @@
 				>
 			</File>
 			<File
-				RelativePath=".\GameTilesFactory.h"
-				>
-			</File>
-			<File
 				RelativePath=".\GameTime.h"
 				>
 			</File>
 			<File
+				RelativePath=".\HgeFont.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HgeGameEngine.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HgeGraphicFactory.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HgeLabel.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HgeMenu.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HgeRect.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HgeSlider.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HgeSprite.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HgeSpriteAnimation.h"
+				>
+			</File>
+			<File
 				RelativePath=".\InputParameters.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Label.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Menu.h"
 				>
 			</File>
 			<File
@@ -329,7 +437,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Rect.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Slider.h"
 				>
 			</File>
 			<File
@@ -365,6 +481,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Sprite.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SpriteAnimation.h"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.h"
 				>
 			</File>
@@ -382,6 +506,10 @@
 			</File>
 			<File
 				RelativePath=".\Trace.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Vertex.h"
 				>
 			</File>
 		</Filter>

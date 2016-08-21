@@ -19,7 +19,7 @@
 #include "BigFoodControl.h"
 #include "hgesprite.h"
 #include <memory>
-#include "GameTilesFactory.h"
+#include "GameGraphicFactory.h"
 
 class SnakeFood;
 class SnakePlayer;
@@ -43,7 +43,7 @@ protected:
 public:
 	~GameRun(void)
 	{
-
+	  Destroy(NULL);
 	}
 public:
 	static GamePlay* Instance(void)
@@ -55,8 +55,8 @@ public:
 	// draw
 	virtual void Render(SnakeGame* game);
 	virtual void Enter(SnakeGame* game);
-	virtual void Destroy(SnakeGame* game);
 private:
+	void Destroy(SnakeGame* game);
 	//TODO:convert to smart pointer
 	SnakeFood* mpSnakeFood;
 private:
@@ -72,13 +72,13 @@ private:
 private:
 	int mScore;
 private:
-	shared_ptr<hgeSprite> mPoint;
+	shared_ptr<Sprite> mPoint;
 private:
-	int mSurfaceHeightOffset;
+	float mSurfaceHeightOffset;
 public:
 	void CreateGrid();
 private:
-	shared_ptr<hgeSprite> mGridSprite;
+	shared_ptr<Sprite> mGridSprite;
 	bool mHitPause;
 public:
 	void RenderGrid();

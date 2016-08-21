@@ -35,18 +35,20 @@ private:
 	float mBigFoodTic;
 	float mProgressTic;
 public:
-	void Create(HGE* screen, float surfaceWidth, float surfaceHeight, float surfaceHeightOffset);
+	void Create(shared_ptr<GameGraphicFactory>& graphics, float surfaceWidth, float surfaceHeight, float surfaceHeightOffset);
 	//game logic: update position, get input
 	virtual void UpdateFrame(float fDeltaTime);
 	// draw
 	virtual void Render();
 	void Generate(SnakePlayer* player);
 private:
-	bool BigFoodFilter( hgeRect bigFoodRect );
-	short m_nBigFoodIndex;
-	int m_nSurfaceHeight;
+	bool BigFoodFilter( const Rect& bigFoodRect );
+	short mBigFoodIndex;
+	float mSurfaceHeight;
 public:
 	void OnStart(void);
 	int LaunchTime(SnakePlayer* player);
 	void SetLevel(short level);
+private:
+	shared_ptr<GameGraphicFactory> mGraphics;
 };

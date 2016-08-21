@@ -14,34 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with MightySnake.  If not, see <http://www.gnu.org/licenses/>.
  */
- #pragma once
+#pragma once
+namespace mightysnake {
 
-//#include "hge.h"
-#include "SnakeGame.h"
-//#include "hgefont.h"
-#include "GameEngineFactory.h"
-
-using namespace mightysnake;
-
-class GameMain        
+	class Vertex
 {
 public:
-	static GameMain& GetInstance();
-	
-	bool Create(void);
-	bool Run();
-	void Destroy(void);
-	static bool FrameFunc();
-	static bool RenderFunc();
-	void ErrorMessage();
-private:
-	GameMain(void);
-	~GameMain(void);
-	bool UpdateFrame();
-	void Render();
-    
-	//HGE * mpEngine;
-	SnakeGame mSnakeGame;
-	//hgeFont* mpFnt;
-    shared_ptr<Font> mFnt;
-};
+	Vertex(void);
+	virtual ~Vertex(void);
+	float x, y;
+	};
+
+}

@@ -40,15 +40,15 @@ bool GameRun::UpdateFrame(SnakeGame* game)
 
 	if ( 0 == game) return true;
 
-	HGE* mScreen = game->GetScreen();
+	//HGE* pScreen = game->GetScreen();
+     shared_ptr<GameEngine> gameEngine = game->GetEngine();
+	//if (0 == pScreen)
+	//{
+	//	MessageBox(NULL, "SnakeGame::OnRun  0 == mScreen ", "Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
+	//	return true;
+	//}
 
-	if (0 == mScreen)
-	{
-		MessageBox(NULL, "SnakeGame::OnRun  0 == mScreen ", "Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
-		return true;
-	}
-
-	if (mScreen->Input_GetKeyState(HGEK_ESCAPE)) 
+	 if (gameEngine->InputGetKeyState(GameEngine::KEY_ESCAPE)) 
 	{
 		mHitPause = true;
 		ChangeState(game, GameInit::Instance());
@@ -57,7 +57,9 @@ bool GameRun::UpdateFrame(SnakeGame* game)
 
 	mpPlayer->UpdateTurn();
 
-	float timeEvent = mScreen->Timer_GetDelta();
+	//float timeEvent = pScreen->Timer_GetDelta();
+    float timeEvent = gameEngine->TimerGetDelta();
+
 	mpPlayer->UpdateFrame(timeEvent);
 
 	if (InputParameters::Instance().IsDebugAnimation())
@@ -126,16 +128,16 @@ void GameRun::Enter(SnakeGame* game)
 		return;
 	}
 
-	float m_nSurfaceWidth, m_nSurfaceHeight;
-	game->GetSurfaceDimension(m_nSurfaceWidth, m_nSurfaceHeight);
-    HGE* mScreen = game->GetScreen();
+	float surfaceWidth, surfaceHeight;
+	game->GetSurfaceDimension(surfaceWidth, surfaceHeight);
+    //HGE* mScreen = game->GetScreen();
 
      mpSnakeFood = game->GetSnakeFood();
 	 if(NULL == mpSnakeFood)
         {
         mpSnakeFood = new SnakeFood();
-        mpSnakeFood->SetFoodRange(m_nSurfaceWidth, m_nSurfaceHeight);
-        mpSnakeFood->Create(mScreen, GameTilesFactory::TILE_TYPE_FOOD);
+        mpSnakeFood->SetFoodRange(surfaceWidth, surfaceHeight);
+        mpSnakeFood->Create(game->GetEngine()->GetGraphicFactory(), GameGraphicFactory::TILE_FOOD);
 		mpSnakeFood->SetScorePrice(SCORE_PRICE);
         }
     mpSnakeFood->Generate();
@@ -143,9 +145,9 @@ void GameRun::Enter(SnakeGame* game)
     CreatePlayer(game);
     mScore = 0;
 
-	mPoint = GameTilesFactory::instance().CreatePoint();
+	mPoint = game->GetEngine()->GetGraphicFactory()->CreatePoint();
 
-	mBigFoodControl.Create(mScreen, m_nSurfaceWidth, m_nSurfaceHeight, mSurfaceHeightOffset);
+	mBigFoodControl.Create(game->GetEngine()->GetGraphicFactory(), surfaceWidth, surfaceHeight, mSurfaceHeightOffset);
 
 	mBigFoodControl.OnStart();
 
@@ -181,18 +183,18 @@ void GameRun::CreatePlayer(SnakeGame* game)
 
 void GameRun::CreateGrid()
 {
-	mGridSprite = GameTilesFactory::instance().CreateGrid();
+	//mGridSprite = GameGraphicFactory::instance().CreateGrid();
 }
 
 
 void GameRun::RenderGrid()
 {
 
-	for (int y = 0; y < 30; y++) {
-		for (int x = 0; x < 40; x++) {
-			mGridSprite->Render(x*16.0f, y*16.0f);
-		}
-	}
+	//for (int y = 0; y < 30; y++) {
+	//	for (int x = 0; x < 40; x++) {
+	//		mGridSprite->Render(x*16.0f, y*16.0f);
+	//	}
+	//}
 }
 
 void GameRun::DisplayScore(SnakeGame* game)
@@ -201,11 +203,11 @@ void GameRun::DisplayScore(SnakeGame* game)
 		return;
 	}
 
-	hgeFont* mFnt = game->GetFont();
-	if (0 == mFnt)
-	{
-		return;
-	}
+	shared_ptr<Font> fnt = game->GetFont();
+	//if (0 == fnt)
+	//{
+	//	return;
+	//}
 
     float m_nSurfaceWidth, m_nSurfaceHeight;
 	game->GetSurfaceDimension(m_nSurfaceWidth, m_nSurfaceHeight);
@@ -213,13 +215,13 @@ void GameRun::DisplayScore(SnakeGame* game)
 	RenderLine(m_nSurfaceWidth, m_nSurfaceHeight);
 
 	hgeColor yellowColor(1, 0.95f, 0, 1);
-	mFnt->SetColor(yellowColor.GetHWColor());
-	mFnt->SetScale(0.5f);
+	fnt->SetColor(yellowColor.GetHWColor());
+	fnt->SetScale(0.5f);
 	stringstream ss;
 	ss << mScore;
 	string strScore = ss.str();
-	float width = mFnt->GetStringWidth(strScore.c_str(), false);
-	mFnt->Render(m_nSurfaceWidth - width, m_nSurfaceHeight , HGETEXT_RIGHT, strScore.c_str());
+	float width = fnt->GetStringWidth(strScore.c_str());
+	fnt->Render(m_nSurfaceWidth - width, m_nSurfaceHeight , HGETEXT_RIGHT, strScore.c_str());
 
 }
 
@@ -230,10 +232,10 @@ void GameRun::LaunchTime( SnakeGame* pGame, float timeEvent )
 	assert( 0 != pGame);
 	try 
 	{
-		if (mpPlayer->IntersectHead(mpSnakeFood->GetBoundingBox()))
+		if (mpPlayer->IntersectHead(*mpSnakeFood->GetBoundingBox()))
 		{
 			mpSnakeFood->Generate();
-			while (mpPlayer->Intersect(mpSnakeFood->GetBoundingBox()))
+			while (mpPlayer->Intersect(*mpSnakeFood->GetBoundingBox()))
 			{
 				mpSnakeFood->Generate();
 			}
@@ -261,7 +263,7 @@ void GameRun::LaunchTime( SnakeGame* pGame, float timeEvent )
 	}
 	catch (...) 
 	{
-		MessageBox(NULL, "LaunchTime - unknown exception ", "Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
+		//MessageBox(NULL, "LaunchTime - unknown exception ", "Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
 	}
 }
 

@@ -15,15 +15,17 @@
  * along with MightySnake.  If not, see <http://www.gnu.org/licenses/>.
  */
  #pragma once
-#include "hge.h"
-#include "hgeanim.h"
+//#include "hge.h"
+//#include "hgeanim.h"
 #include<vector>
 using namespace std;
 #include "SnakePart.h"
-#include "GameTilesFactory.h"
+#include "GameGraphicFactory.h"
 #include "GamePlay.h"
 #include <sstream>
 using namespace std;
+#include "Vertex.h"
+using namespace mightysnake;
 
 class SnakePartList: public GamePlay
 {
@@ -33,29 +35,29 @@ public:
 	// draw
 	virtual void Render() ;
 
-	SnakePartList(HGE* engine);
+	SnakePartList(float snakePartWidth, float snakePartHeight);
 	~SnakePartList(void);
-	void Create();
-	void Destroy();
-	bool IntersectHead(const hgeRect& boundingBox);
-	bool Intersect(const hgeRect& boundingBox);
-	void Grow(const hgeVertex& offsetPos);
+	void Create(shared_ptr<GameGraphicFactory>& gameGraphicFactory);
+	//void Destroy();
+	bool IntersectHead(const Rect& boundingBox);
+	bool Intersect(const Rect& boundingBox);
+	void Grow(const Vertex& offsetPos);
 	void StepDown(int ix);
 	void StepUp(int ix);
 	void StepRight(int ix);
 	void StepLeft(int ix);
 	bool IsSelfHit();
-	hgeVertex GetHeadPosition();
-	hgeVertex GetTailPosition();
+	Vertex GetHeadPosition();
+	Vertex GetTailPosition();
 	bool IsHeadEvenPosition();
 	bool IsTailEvenPosition();
 	int GetSize();
 	bool IsBorder();
 private:
-	bool IsEvenPosition(const hgeVertex& r);
-	void InitSnakeSkin();
+	bool IsEvenPosition(const Vertex& r);
+	void InitSnakeSkin(shared_ptr<GameGraphicFactory>& gameGraphicFactory);
 	vector<SnakePart> mSnakeActor;
-	hgeVertex mOriginOffset;
+	Vertex mOriginOffset;
 	float mSnakePartWidth;
 	float mSnakePartHeight;
 
@@ -72,6 +74,7 @@ private:
 	float mSurfaceWidth;
 	float mSurfaceHeight;
 	bool mIsHit;
+	shared_ptr<GameGraphicFactory> mGameGraphicFactory;
 public:
 
 	bool IsHit(void)
@@ -87,6 +90,6 @@ public:
 private:
 	bool IsBorder(float x, float y);
 public:
-	hgeVertex GetOriginOffset(void);
+	Vertex GetOriginOffset(void);
 };
 
